@@ -1,0 +1,20 @@
+{
+  "vcf": {
+    "id": [
+      {"path": "test/data/dbsnp.vcf.gz", "colname": "dbSNP"}
+    ],
+    "count": [
+      {"path": "test/data/1kg_dup.vcf.gz", "colname": "DUPLICATED_COUNT"}
+    ],
+    "info": [
+      {"path": "test/data/1kg.vcf.gz",
+        "colname": "REF_1000G_SNP", "ref_colname": "AF"}
+    ]
+  },
+
+  "tabix": [
+  ],
+
+  "bigwig": [
+  ]
+}

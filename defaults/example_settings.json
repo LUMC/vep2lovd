@@ -1,0 +1,22 @@
+{
+  "vcf": {
+    "id": [
+      {"path": "/path/to/dbsnp.vcf.gz", "colname": "dbSNP"}
+    ],
+    "count": [
+      {"path": "/path/to/a/vcf.gz", "colname": "someCount"}
+
+    ],
+    "info": [
+      {"path": "/path/to/another/vcf.gz", "colname": "someInfo", "ref_colname": "THE_INFO_FIELD"}
+    ]
+  },
+
+  "tabix": [
+    {"path": "/path/to/file.tsv.gz", "colnames": ["some", "annotatation", "columns"]}
+  ],
+
+  "bigwig": [
+    {"path": "/path/to/bw/dirs", "colname": "someBw"}
+  ]
+}

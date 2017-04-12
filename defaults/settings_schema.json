@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "vep2lovd settings schema",
+  "description": "Schema for settings json of vep2lovd",
+  "type": "object",
+
+  "required": ["vcf", "tabix", "bigwig"],
+
+  "properties": {
+
+    "vcf": {
+      "description": "VCF files",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "array",
+          "minItems": 0,
+          "items": {"$ref": "#/definitions/id_vcf"}
+        },
+
+        "count": {
+          "type": "array",
+          "minItems": 0,
+          "items": {"$ref": "#/definitions/count_vcf"}
+        },
+
+        "info": {
+          "type": "array",
+          "minItems": 0,
+          "items": {"$ref": "#/definitions/info_vcf"}
+        }
+      }
+    },
+    "tabix": {
+      "description": "Tabix files",
+      "minItems": 0,
+      "type": "array",
+      "items": {"$ref": "#/definitions/tabix_file"}
+    },
+    "bigwig": {
+      "description": "Bigwig directories",
+      "minItems": 0,
+      "type": "array",
+      "items": {"$ref": "#/definitions/bigwig_dir"}
+    }
+  },
+
+  "definitions": {
+
+    "tabix_file": {
+      "type": "object",
+      "required": ["path", "colnames"],
+      "properties": {
+        "path": {"type": "string"},
+        "colnames": {
+          "type": "array",
+          "items": {"type":"string"}
+        }
+      }
+    },
+
+    "bigwig_dir": {
+      "type": "object",
+      "required": ["path", "colname"],
+      "properties": {
+        "path": {"type": "string"},
+        "colname": {"type": "string"}
+      }
+    },
+
+    "id_vcf": {
+      "type": "object",
+      "required": ["path", "colname"],
+      "properties": {
+        "path": {"type": "string"},
+        "colname": {"type": "string"}
+      }
+    },
+
+    "count_vcf": {
+      "type": "object",
+      "required": ["path", "colname"],
+      "properties": {
+        "path": {"type": "string"},
+        "colname": {"type": "string"}
+      }
+    },
+
+    "info_vcf": {
+      "type": "object",
+      "required": ["path", "colname", "ref_colname"],
+      "properties": {
+        "path": {"type": "string"},
+        "colname": {"type": "string"},
+        "ref_colname": {"type": "string"}
+      }
+    }
+  }
+}
