@@ -290,7 +290,11 @@ class Annotator(object):
 
             for ps_colname in COLS_PER_SAMPLE:
                 if ps_colname in ('GT', 'GQ'):
-                    value = getattr(sample.data, ps_colname, fallback)
+                    col_value = getattr(sample.data, ps_colname, fallback)
+                    if col_value is None:
+                        value = fallback
+                    else:
+                        value = col_value
                 elif ps_colname in ('AD', 'ALTPERC', 'DPALT', 'DPREF', 'DP'):
                     value = ad_data[ps_colname]
                 elif ps_colname == 'PLALT':
