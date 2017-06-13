@@ -56,7 +56,7 @@ class SingleFilter(object):
         """
         contig = transcript.CHROM
         if any([r.match(contig) for r in self.annotator.exclude_contig_regex]):
-            return False
+            return True
         if transcript.INFO["Consequence"] in self.filter_cons:
             return False
         else:
@@ -70,7 +70,7 @@ class SingleFilter(object):
         val = True
         contig = transcript.CHROM
         if any([r.match(contig) for r in self.annotator.exclude_contig_regex]):
-            return False
+            return True
         for filter in self.filter_contains_cons:
             if filter in transcript.INFO["Consequence"]:
                 val = False
