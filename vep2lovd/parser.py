@@ -17,6 +17,19 @@ from .filter import SingleFilter, MultiFilter
 from .annotate import Annotator
 from .mapping import GVSFunction, DEFAULT_GATK_MAPPING
 
+_RESERVED_VCF_FIELDS = [
+    "CHROM",
+    "POS",
+    "REF",
+    "ALT",
+    "ID"
+    "QUAL",
+    "FILTERvcf",
+    "GATKCaller",
+    "GVS"
+]
+
+
 class ExplodeVepVCF(object):
     """
     This object is a parser for VEP
@@ -249,6 +262,8 @@ class LOVDFile(object):
         annotated['GVS'] = self.mapper.map(transcript.INFO["Consequence"])
 
         for column in self.VCFReader.all_info_names:
+            if column in _RESERVED_VCF_FIELDS:
+                continue
             if column not in transcript.INFO:
                 annotated[column] = 'unknown'
                 continue
