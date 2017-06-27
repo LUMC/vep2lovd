@@ -88,8 +88,14 @@ class Ped(object):
     def __init__(self, filename):
         self.__filename = filename
         self.__handle = open(filename, "rb")
-        self.PedSample = namedtuple('PedSample', ['family_id', 'individual_id', 'paternal_id',
-                                             'maternal_id', 'sex', 'phenotype', 'genotypes'])
+        self.PedSample = namedtuple('PedSample', [
+            'family_id',
+            'individual_id',
+            'paternal_id',
+            'maternal_id',
+            'sex',
+            'phenotype',
+            'genotypes'])
         self.ped_samples = self._parse(self.__handle)
         self.__handle.close()
         if not all([self.validate(x) for x in self.ped_samples]):
@@ -97,7 +103,10 @@ class Ped(object):
             raise ValueError("Ped sample fail validation test")
 
     def __repr__(self):
-        return "Ped(filename={0}, n_samples={1})".format(self.__filename, len(self.ped_samples))
+        return "Ped(filename={0}, n_samples={1})".format(
+            self.__filename,
+            len(self.ped_samples)
+        )
 
     def _parse(self, handle):
         """
@@ -109,11 +118,13 @@ class Ped(object):
         for line in handle:
             stripped = line.strip()
             contents = re.split('\s+', stripped)
-            assert len(contents) >= 6, "Line {0} is not a ped line".format(stripped)
+            assert len(contents) >= 6, "Line {0} " \
+                                       "is not a ped line".format(stripped)
             genotypes = []
             if len(contents) > 6:
                 genotypes = contents[7:]
-            pedsamples.append(self.PedSample(*contents[:6], genotypes=genotypes))
+            pedsamples.append(self.PedSample(*contents[:6],
+                                             genotypes=genotypes))
         return pedsamples
 
     def validate(self, ped_sample):
@@ -191,7 +202,6 @@ class Ped(object):
         return [x for x in self.ped_samples if x.phenotype == "2"]
 
 
-
 def clean_transcript(transcript):
     """
     This function does some cleaning
@@ -232,7 +242,7 @@ def make_lovd_numeric(number):
     if float(number).is_integer():
         return str(int(number))
     e_not = "{:3e}".format(number)
-    if not "-" in e_not:
+    if "-" not in e_not:
         return "{:.3f}".format(number)
     else:
         exp = int(float(e_not.split("-")[-1]))
@@ -254,8 +264,10 @@ def make_lovd_numeric(number):
 def collapse_values(val):
     """
     Return a single value for several possible inputs
-    Input value can be a number, a list of number, a string, or a list of strings
-    If it's a list, this will return the first item since LOVD cannot handle multiple values for a field
+    Input value can be a number, a list of number,
+    a string, or a list of strings
+    If it's a list, this will return the first item since
+    LOVD cannot handle multiple values for a field
     :param val: the value(s)
     :return: collapsed value
     """

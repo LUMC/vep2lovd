@@ -17,7 +17,8 @@ class MultiFilter(object):
         self.annotator = annotator
 
     def filter_xm(self, transcripts):
-        refseq_transcripts = [x for x in transcripts if self.annotator.is_refseq(x)]
+        refseq_transcripts = [x for x in transcripts if
+                              self.annotator.is_refseq(x)]
         nm_transcript = []
         for tr in refseq_transcripts:
             if tr.INFO['Feature'].startswith("NM"):
@@ -44,7 +45,8 @@ class SingleFilter(object):
     """
     Class for filtering based on a single transcript
     """
-    def __init__(self, annotator, filter_consequences=None, filter_contains_consequences=None):
+    def __init__(self, annotator, filter_consequences=None,
+                 filter_contains_consequences=None):
         self.annotator = annotator
         self.filter_cons = filter_consequences
         self.filter_contains_cons = filter_contains_consequences
@@ -64,7 +66,8 @@ class SingleFilter(object):
 
     def filter_contains_consequences(self, transcript):
         """
-        This function retiurns false if transcript has consequence matching anything in FILTER_CONTAINS_CONSEQUENCES
+        This function retiurns false if transcript has consequence
+        matching anything in FILTER_CONTAINS_CONSEQUENCES
         ignore for exclude contigs
         """
         val = True
@@ -81,7 +84,8 @@ class SingleFilter(object):
         """
         Check whether a transcript has a distance to splice greater than max
         Non-intronic transcripts will always return False
-        :param transcript: vcf record with assumed Consequence and Feature info fields
+        :param transcript: vcf record with assumed Consequence and
+        Feature info fields
         :param maximum: integer, max allowed dsp
         :return: Boolean
         """

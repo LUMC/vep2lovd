@@ -12,7 +12,8 @@ import six
 
 import vcf
 
-from .utils import RecordWrapper, set_config, clean_transcript, Ped, collapse_values, _is_vcf_version_at_least_0_6_8
+from .utils import RecordWrapper, set_config, clean_transcript, Ped, \
+    collapse_values
 from .filter import SingleFilter, MultiFilter
 from .annotate import Annotator
 from .mapping import GVSFunction, DEFAULT_GATK_MAPPING
@@ -96,7 +97,8 @@ class ExplodeVepVCF(object):
         names = vep_header.split(': ')[1].split('|')
         for name in names:
             info = namedtuple('Info', ['id', 'num', 'type', 'desc'])
-            tmp = info(id=name, num=None, type='String', desc='A VEP annotation')
+            tmp = info(id=name, num=None,
+                       type='String', desc='A VEP annotation')
             tmp_infos[name] = tmp
         return names, tmp_infos
 
@@ -133,24 +135,33 @@ class ExplodeVepVCF(object):
 
 
 class LOVDFile(object):
-    def __init__(self, vcf_filename, ped_file, settings_json, filter_consequences=None,
-                 filter_contains_consequences=None, filter_dsp=50, filter_xm=True, filter_refseq=True,
-                 filter_identical=True, gatk_caller_field="GATKCaller", gatk_caller_mapping=DEFAULT_GATK_MAPPING, exclude_contigs_patterns=None):
+    def __init__(self, vcf_filename, ped_file, settings_json,
+                 filter_consequences=None, filter_contains_consequences=None,
+                 filter_dsp=50, filter_xm=True, filter_refseq=True,
+                 filter_identical=True, gatk_caller_field="GATKCaller",
+                 gatk_caller_mapping=DEFAULT_GATK_MAPPING,
+                 exclude_contigs_patterns=None):
         """
         Object representing an LOVD data file
         :param vcf_filename: Path to input VCF
         :param ped_file: Path to PED file
         :param settings_json: Path to settings JSON
         :param filter_consequences: List of consequences to filter out soft
-        :param filter_contains_consequences: List of consequences to filter out hard
-        :param filter_dsp: Max distance to splice for intronic variants (default = 50, set to 0 to disable filter)
+        :param filter_contains_consequences: List of consequences to filter
+        out hard
+        :param filter_dsp: Max distance to splice for intronic variants
+        (default = 50, set to 0 to disable filter)
         :param filter_xm: Filter out transcripts which are XM if NM exists
         (only together with filter_refseq. Default = True)
-        :param filter_refseq: Filter out non-refseq transcripts (default = True)
-        :param filter_identical: Filter out identical transcripts (default = True)
+        :param filter_refseq: Filter out non-refseq transcripts
+        (default = True)
+        :param filter_identical: Filter out identical transcripts
+        (default = True)
         :param gatk_caller_field: INFO field that contains caller information
-        :param gatk_caller_mapping: dictionary for mapping between `gatk_caller_field` values and LOVD GATKCaller values
-        :param exclude_contigs_patterns: regex patterns for contigs to exclude from filter_refseq and filter_xm
+        :param gatk_caller_mapping: dictionary for mapping between
+        `gatk_caller_field` values and LOVD GATKCaller values
+        :param exclude_contigs_patterns: regex patterns for contigs to
+        exclude from filter_refseq and filter_xm
         :return:
         """
 
@@ -163,7 +174,8 @@ class LOVDFile(object):
         else:
             self.exclude_contigs_re = []
 
-        self.annotator = Annotator(settings_json, self.__ped, self.exclude_contigs_re)
+        self.annotator = Annotator(settings_json, self.__ped,
+                                   self.exclude_contigs_re)
 
         if filter_xm and not filter_refseq:
             raise ValueError("Cannot set filter XM without filter refseq")
@@ -190,7 +202,8 @@ class LOVDFile(object):
         else:
             self._do_dsp = False
 
-        self.single_filter = SingleFilter(self.annotator, filter_consequences, filter_contains_consequences)
+        self.single_filter = SingleFilter(self.annotator, filter_consequences,
+                                          filter_contains_consequences)
         self.multi_filter = MultiFilter(self.annotator)
 
         self.mapper = GVSFunction()
@@ -224,7 +237,10 @@ class LOVDFile(object):
                 if not self.single_filter.filter_contains_consequences(tr):
                     poppables.add(i)
             if self._do_dsp:
-                if self.single_filter.filter_distance_to_splice(tr, self._filter_dsp):
+                if self.single_filter.filter_distance_to_splice(
+                        tr,
+                        self._filter_dsp
+                ):
                     poppables.add(i)
             if len(tr.INFO["Consequence"]) == 0:
                 poppables.add(i)

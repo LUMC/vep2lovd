@@ -13,13 +13,13 @@ import os
 import sys
 
 import vcf
-from pysam import Tabixfile
 from bx.bbi.bigwig_file import BigWigFile
 from pysam import Tabixfile
 import hgvs.parser
 from hgvs.exceptions import HGVSParseError
 
-from .utils import PeekableIterator, set_config, collapse_values, _is_vcf_version_at_least_0_6_8
+from .utils import PeekableIterator, set_config, \
+    collapse_values, _is_vcf_version_at_least_0_6_8
 
 COLS_RECORD = [
     'scorePhastCons'
@@ -45,12 +45,12 @@ class Annotator(object):
         self.exclude_contig_regex = ex_cont_re
 
     def __prep_vcf(self, path):
-        if not path in self.readers:
+        if path not in self.readers:
             self.readers[path] = vcf.Reader(filename=path)
         return self.readers[path]
 
     def __prep_tabix(self, path):
-        if not path in self.readers:
+        if path not in self.readers:
             self.readers[path] = Tabixfile(path)
         return self.readers[path]
 
@@ -87,19 +87,35 @@ class Annotator(object):
     def get_custom_annotations(self, record):
         annot = {}
         for x in self.config['vcf'].get('id', []):
-            annot[x.get('colname', None)] = self.vcf_id(record, self.__prep_vcf(x.get('path', None)))
+            annot[x.get('colname', None)] = self.vcf_id(
+                record,
+                self.__prep_vcf(x.get('path', None))
+            )
 
         for x in self.config['vcf'].get('count', []):
-            annot[x.get('colname', None)] = self.vcf_count_occurences(record, self.__prep_vcf(x.get('path', None)))
+            annot[x.get('colname', None)] = self.vcf_count_occurences(
+                record,
+                self.__prep_vcf(x.get('path', None))
+            )
 
         for x in self.config['vcf'].get('info', []):
-            annot[x.get('colname', None)] = self.vcf_frequency(record, self.__prep_vcf(x.get('path', None)), x.get('ref_colname', None))
+            annot[x.get('colname', None)] = self.vcf_frequency(
+                record,
+                self.__prep_vcf(x.get('path', None)),
+                x.get('ref_colname', None)
+            )
 
         for x in self.config.get('tabix', []):
-            annot.update(self.tabix_file(record, self.__prep_tabix(x.get('path', None)), x.get('colnames', [])))
+            annot.update(self.tabix_file(
+                record,
+                self.__prep_tabix(x.get('path', None)),
+                x.get('colnames', []))
+            )
 
         for x in self.config.get('bigwig', []):
-            annot[x.get('colname', None)] = self.bigwig_directory(record, x.get('path', None))
+            annot[x.get('colname', None)] = self.bigwig_directory(
+                record, x.get('path', None)
+            )
 
         return annot
 
@@ -110,7 +126,11 @@ class Annotator(object):
         :param reference_vcf: vcf reader of reference vcf
         :return: Count
         """
-        ref_iter = self.__get_vcf_region(record.CHROM, record.POS, reference_vcf)
+        ref_iter = self.__get_vcf_region(
+            record.CHROM,
+            record.POS,
+            reference_vcf
+        )
 
         if ref_iter is None:
             return 'unknown'
@@ -123,7 +143,8 @@ class Annotator(object):
 
         return collapse_values(count)
 
-    def vcf_frequency(self, record, reference_vcf, column_name, fallback='unknown'):
+    def vcf_frequency(self, record, reference_vcf,
+                      column_name, fallback='unknown'):
         """
         :param record:
         :param reference_vcf:
@@ -131,7 +152,11 @@ class Annotator(object):
         :param fallback:
         :return:
         """
-        ref_iter = self.__get_vcf_region(record.CHROM, record.POS, reference_vcf)
+        ref_iter = self.__get_vcf_region(
+            record.CHROM,
+            record.POS,
+            reference_vcf
+        )
 
         if ref_iter is None:
             return fallback
@@ -141,19 +166,26 @@ class Annotator(object):
             if col is None:
                 return fallback
             info_number = col.num
-            val = self.__get_ref_record_column(record, ref_rec, column_name, info_number)
+            val = self.__get_ref_record_column(
+                record,
+                ref_rec,
+                column_name,
+                info_number
+            )
             if val is not None:
                 return collapse_values(val)
 
         return fallback
 
-    def __get_ref_record_column(self, rec, ref_rec, column, info_number, fallback='unknown'):
+    def __get_ref_record_column(self, rec, ref_rec, column,
+                                info_number, fallback='unknown'):
         """
         Get the correct column value of a reference record
         :param rec: query record
         :param ref_rec: reference reocrd
         :param column: column name
-        :param info_number: number of info field. Uses pyvcf-style numbers (i.e. A = -1, G = -2, R = -3)
+        :param info_number: number of info field.
+        Uses pyvcf-style numbers (i.e. A = -1, G = -2, R = -3)
         :return: value or None
         """
 
@@ -168,7 +200,7 @@ class Annotator(object):
             s2 = set([x.sequence for x in ref_rec.ALT])
         elif info_number == -2:  # one value per possible genotype
             return NotImplementedError
-        elif info_number == -3:  # one value per each possible allele (incl. ref)
+        elif info_number == -3:  # one value per each possible allele
             s1 = set([x.sequence for x in rec.ALT]).union({rec.REF})
             s2 = set([x.sequence for x in ref_rec.ALT]).union({ref_rec.REF})
 
@@ -192,9 +224,11 @@ class Annotator(object):
             for rec in iter:
                 return rec.ID
 
-    def tabix_file(self, record, reference_tabix, columns=None, fallback='unknown'):
+    def tabix_file(self, record, reference_tabix,
+                   columns=None, fallback='unknown'):
         """
-        Retrieve columns from a tabix file (i.e. gzipped and tabixxed tsv file)
+        Retrieve columns from a tabix file
+        (i.e. gzipped and tabixxed tsv file)
         :param record: query VCF record
         :param reference_tabix: instance of Tabixfile
         :param columns: names of columns to retrieve
@@ -202,7 +236,9 @@ class Annotator(object):
         :return: dict of {column: value}
         """
         default = {x: fallback for x in columns}
-        if record.CHROM.startswith('chr') and not any([x.startswith('chr') for x in reference_tabix.contigs]):
+        if record.CHROM.startswith('chr') and not any(
+                [x.startswith('chr') for x in reference_tabix.contigs]
+        ):
             chrom = record.CHROM.replace('chr', '')
         else:
             chrom = record.CHROM
@@ -211,8 +247,11 @@ class Annotator(object):
 
         # we ONLY consider the LAST line of any header field. This MUST be tab-delimited
         if not hasattr(self, "__tabix_header_{0}".format(reference_tabix)):
-            setattr(self, "__tabix_header_{0}".format(reference_tabix), [x for x in reference_tabix.header])
-        tabix_header = getattr(self, "__tabix_header_{0}".format(reference_tabix))[-1].strip().split("\t")
+            setattr(self, "__tabix_header_{0}".format(reference_tabix),
+                    [x for x in reference_tabix.header])
+        tabix_header = getattr(
+            self, "__tabix_header_{0}".format(reference_tabix)
+        )[-1].strip().split("\t")
 
         try:
             ref_iter = reference_tabix.fetch(chrom, start=start, end=end)
@@ -226,12 +265,12 @@ class Annotator(object):
 
         for ref_rec in ref_piter:
             row = ref_rec.split('\t')
-            assert len(row) == len(tabix_header), "{0} {1}".format(len(row),
-                                                                    len(tabix_header))
+            assert len(row) == len(tabix_header), \
+                "{0} {1}".format(len(row), len(tabix_header))
             # check POS, REF, ALT ~ only fetch value if all three are the same
             # with their record counterpart
             if str(record.POS) == row[1] and record.REF == row[2] and \
-                            ','.join([str(x) for x in record.ALT]) == row[3]:
+                    ','.join([str(x) for x in record.ALT]) == row[3]:
                 for colname in columns:
                     default[colname] = collapse_values(row[tabix_header.index(colname)])
             else:
@@ -323,7 +362,7 @@ class Annotator(object):
                 value = '1'
                 gt = getattr(sample.data, 'GT')
                 if gt is not None and (not gt.startswith('0') or not
-                gt.endswith('0')):
+                   gt.endswith('0')):
                     value = '6'
                 elif altperc > 10:
                     value = '5'
@@ -374,7 +413,8 @@ class Annotator(object):
         try:
             variant = self.hgvs_parser.parse_hgvs_variant(description)
         except HGVSParseError:
-            sys.stderr.write("WARNING! HGVS notation {0} seems to be invalid\n".format(description))
+            sys.stderr.write("WARNING! HGVS notation {0} "
+                             "seems to be invalid\n".format(description))
             return None
 
         base_offset = variant.posedit.pos.start
