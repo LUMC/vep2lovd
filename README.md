@@ -6,6 +6,16 @@ This is a package for annotating, filtering, and converting VEP-annotated VCFs t
 LOVD is transcript-based rather than variant-based, so we will have to make some implicit conversions.
 We therefore expect the input to this module to be pre-filtered; i.e. removing all records for which no VEP annotation exists (e.g. Mitochondrial DNA)
 
+Installation
+------------
+
+To install vep2lovd, we recommend using a virtual environment.
+
+`numpy` _must_ be installed before running `pip install -r requirements.txt`.
+After installing `numpy`, install all other dependencies with `pip install -r requirements.txt`
+Finally, install vep2lovd with `python setup.py develop`
+
+
 How to use
 ----------
 
