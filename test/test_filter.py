@@ -27,7 +27,7 @@ def ped():
 
 @pytest.fixture
 def annot(ped):
-    return Annotator(conf, ped)
+    return Annotator(conf, ped, [])
 
 
 @pytest.fixture

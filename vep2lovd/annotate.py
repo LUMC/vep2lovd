@@ -13,7 +13,7 @@ import os
 import sys
 
 import vcf
-from bx.bbi.bigwig_file import BigWigFile
+import pyBigWig
 from pysam import Tabixfile
 import hgvs.parser
 from hgvs.exceptions import HGVSParseError
@@ -290,9 +290,9 @@ class Annotator(object):
         :return: value
         """
         bw_name = os.path.join(reference_bw_dir, record.CHROM + '.bw')
-        # query bw files using bx-python ~ TAKE COORDINATE SETTING INTO ACCOUNT
-        bw = BigWigFile(open(bw_name, 'r'))
-        qres = bw.get(record.CHROM, record.POS - 1, record.POS)
+        # query bw files using pyBigWig ~ TAKE COORDINATE SETTING INTO ACCOUNT
+        bw = pyBigWig.open(bw_name)
+        qres = bw.intervals(record.CHROM, record.POS - 1, record.POS)
         if qres:
             return collapse_values(qres[0][-1])
 

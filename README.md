@@ -10,18 +10,15 @@ Installation
 ------------
 
 To install vep2lovd, we recommend using a virtual environment.
+After cloning this repo, and creating a virtualenv, run the following:
 
-`numpy` _must_ be installed before running `pip install -r requirements.txt`.
-This is due to `bx-python`, which we use to read BigWig files, 
-installs the proper C-extensions only when numpy is installed.
- 
-After installing `numpy`, install all other dependencies with `pip install -r requirements.txt`
-Finally, install vep2lovd with `python setup.py develop`
+```bash
+pip install -r requirements.txt
+python setup.py develop
+```
 
-Pre-compiled wheels of `bx-python` may not necessarily include the proper
-extensions. In case you encounter issues even after installing numpy,
-you may have to set the `--no-cache` flag to pip when installing `bx-python`. 
-
+If you encounter errors, first make sure you have the newest pip, setuptools
+and wheel packages.
 
 How to use
 ----------
