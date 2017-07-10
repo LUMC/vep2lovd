@@ -1,7 +1,7 @@
 numpy
 pyvcf>=0.6.7
 biopython==1.68
-bx-python==0.7.1
+pyBigWig[numpy_input]
 cython
 pysam
 hgvs==0.3.7

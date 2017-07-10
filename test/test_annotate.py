@@ -26,7 +26,7 @@ def ped():
 
 @pytest.fixture
 def annot(ped):
-    return Annotator(conf, ped)
+    return Annotator(conf, ped, [])
 
 
 @pytest.fixture
@@ -111,3 +111,7 @@ class TestAnnotator(object):
             val = annot._get_distance_to_splice(tr, "DSP")
             assert "DSP" in val
             assert val["DSP"] == 'unknown' or float(val["DSP"]) % 1 == 0
+
+    def test_bw(self, annot, record):
+        bw_dir = join(dirname(realpath(__file__)), "data")
+        assert annot.bigwig_directory(record[0], bw_dir) == "1"
