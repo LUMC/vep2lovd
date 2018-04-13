@@ -8,6 +8,7 @@ vep2lovd.parser
 __author__ = 'Sander Bollen'
 
 from collections import namedtuple, OrderedDict
+import warnings
 import six
 
 import vcf
@@ -63,7 +64,17 @@ class ExplodeVepVCF(object):
         Get transcripts from a VEP-formatted VCF line
         Returns a list of transcripts as pyvcf records
         """
-        csq = self.current_line.INFO['CSQ']
+        try:
+            csq = self.current_line.INFO['CSQ']
+        except KeyError:
+            warnings.warn(
+                "VCF record as position {0}:{1} "
+                "has no CSQ info field".format(
+                    self.current_line.CHROM,
+                    self.current_line.POS
+                )
+            )
+            return []
         records = []
         for transcript in csq:
             record = RecordWrapper(self.current_line)
@@ -93,7 +104,10 @@ class ExplodeVepVCF(object):
         As well as the names of the headers
         """
         tmp_infos = self.infos
-        vep_header = self.infos['CSQ'][3]
+        try:
+            vep_header = self.infos['CSQ'][3]
+        except KeyError:
+            raise ValueError("This VCF file has no CSQ info field")
         names = vep_header.split(': ')[1].split('|')
         for name in names:
             info = namedtuple('Info', ['id', 'num', 'type', 'desc'])
