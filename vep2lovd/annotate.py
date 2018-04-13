@@ -216,13 +216,16 @@ class Annotator(object):
         else:
             return collapse_values([col[x] for x in idxs])
 
-    def vcf_id(self, record, reference_vcf):
+    def vcf_id(self, record, reference_vcf, fallback='unknown'):
         iter = self.__get_vcf_region(record.CHROM, record.POS, reference_vcf)
         if iter is None:
-            return 'unknown'
+            return fallback
         else:
-            for rec in iter:
-                return rec.ID
+            id = next(rec.ID for rec in iter)
+            if id is None:
+                return fallback
+            else:
+                return id
 
     def tabix_file(self, record, reference_tabix,
                    columns=None, fallback='unknown'):
