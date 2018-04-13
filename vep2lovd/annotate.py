@@ -221,11 +221,11 @@ class Annotator(object):
         if iter is None:
             return fallback
         else:
-            id = next(rec.ID for rec in iter)
-            if id is None:
-                return fallback
-            else:
-                return id
+            for rec in iter:
+                if rec.ID is None:
+                    return fallback
+                else:
+                    return rec.ID
 
     def tabix_file(self, record, reference_tabix,
                    columns=None, fallback='unknown'):

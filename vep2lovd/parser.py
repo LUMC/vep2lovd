@@ -271,7 +271,7 @@ class LOVDFile(object):
             if isinstance(caller_val, six.string_types):
                 annotated['GATKCaller'] = self.gatk_caller_mapping[caller_val]
             else:
-                annotated['GATKCaller'] = self.gatk_caller_mapping[','.join(caller_val)]
+                annotated['GATKCaller'] = self.gatk_caller_mapping[','.join(map(str, caller_val))]
         except KeyError:
             annotated['GATKCaller'] = 'unknown'
 
