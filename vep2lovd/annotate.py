@@ -226,6 +226,7 @@ class Annotator(object):
                     return fallback
                 else:
                     return rec.ID
+            return fallback
 
     def tabix_file(self, record, reference_tabix,
                    columns=None, fallback='unknown'):
