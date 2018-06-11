@@ -181,7 +181,17 @@ class LOVDFile(object):
 
         self.VCFReader = ExplodeVepVCF(vcf.Reader(filename=vcf_filename))
         self.__ped = Ped(ped_file)
-        self.index = self.__ped.get_index_samples()[0]
+        idx = self.__ped.get_index_samples()
+        if len(idx) == 0:
+            raise ValueError("There is no index sample defined. "
+                             "Mark at least one sample as affected "
+                             "in your ped file")
+        elif len(idx) > 1:
+            warnings.warn("There is more than one affected sample "
+                          "in your ped file. "
+                          "Only the first one will be considered "
+                          "the index sample.")
+        self.index = idx[0]
         self.config = set_config(settings_json)
         if exclude_contigs_patterns:
             self.exclude_contigs_re = exclude_contigs_patterns
