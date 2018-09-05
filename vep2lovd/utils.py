@@ -206,12 +206,6 @@ def clean_transcript(transcript):
     """
     This function does some cleaning
     """
-    f = transcript.INFO["Feature"]
-    ff = f.split("_")
-    if len(ff) > 2:
-        tmp = ff[:2]
-        transcript.INFO["Feature"] = "_".join(tmp)
-
     # removing feature_elongation and feature_truncation
     formatted_consequence = transcript.INFO["Consequence"].replace("feature_elongation", "")
     formatted_consequence = formatted_consequence.replace("feature_truncation", "")
