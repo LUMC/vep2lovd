@@ -17,7 +17,7 @@ from .utils import RecordWrapper, set_config, clean_transcript, Ped, \
     collapse_values
 from .filter import SingleFilter, MultiFilter
 from .annotate import Annotator
-from .mapping import GVSFunction, DEFAULT_GATK_MAPPING
+from .mapping import DEFAULT_GATK_MAPPING
 
 _RESERVED_VCF_FIELDS = [
     "CHROM",
@@ -135,7 +135,7 @@ class ExplodeVepVCF(object):
             v = float(v)
 
         if v < 4.0 or v > 4.2:
-            raise
+            raise ValueError
         elif v >= 4.0 and v <= 4.2:
             return True
 
@@ -230,7 +230,6 @@ class LOVDFile(object):
                                           filter_contains_consequences)
         self.multi_filter = MultiFilter(self.annotator)
 
-        self.mapper = GVSFunction()
         self.__current_transcripts = []
         self.__header_shown = False
         self.gatk_caller_field = gatk_caller_field
@@ -298,8 +297,6 @@ class LOVDFile(object):
                 annotated['GATKCaller'] = self.gatk_caller_mapping[','.join(map(str, caller_val))]
         except KeyError:
             annotated['GATKCaller'] = 'unknown'
-
-        annotated['GVS'] = self.mapper.map(transcript.INFO["Consequence"])
 
         for column in self.VCFReader.all_info_names:
             if column in _RESERVED_VCF_FIELDS:
